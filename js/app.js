@@ -1,38 +1,122 @@
-var tileWidth = 101;
-var tileHeight = 83;
-var trueTileHeight = 171;
-var playerStartCol = 2; // (0 to 4)
-var playerStartRow = 5; // (0 to 5)
-var dy = -26; // Vertical adjustment to center sprites in tiles
+/* app.js */
 
-var numEnemies = 5;
+/*
+ * The game logic for "Bugger"
+ * Handles setting initial conditions, handling user input,
+ * and updating object values to be used by the rendering engine.
+ */
+
+/********* Constants and Global Variables *********/
+
+// Constant values refer to current tileset
+// will need to be updated if different sized tiles (images) are used
+var COLWIDTH = 101;
+var ROWHEIGHT = 83;
+var TILEBOTTOM = 37;
+var TILETOP = 51;
+var TILEHEIGHT = 171;
+
+// Change these values to adjust the size of the game
+// Note: This will also increase the canvas size
+var numLanes = 4;
+var numCols = 9;
+
+// Do not modify
+// Always 1 top row (goal) and two bottom rows (player spawn / safe)
+var numRows = numLanes + 3;
+
+// Set canvas height and width for Game Engine and Stats to use
+var canvasWidth = numCols * COLWIDTH;
+var canvasHeight = (numRows * ROWHEIGHT) + TILETOP + TILEBOTTOM;
+
+// Player should start on the bottom row, middle column
+var PLAYER_START_COL = Math.floor(numCols / 2);
+var PLAYER_START_ROW = numRows - 1;
+
+// Vertical adjustment to center sprites in tiles
+var dy = -26;
+
+// Set the number of enemies and the base enemy speed
+var numEnemies = 10;
 var baseEnemySpeed = 200;
-var gameDifficulty = 2; // Set to any integer between 1 (easy) and 9(very hard)
 
+// Set the game difficulty
+// This influences the top speed of the enemies, as well as the range of possible speeds
+// Set to any integer between 1 (easy, single-speed) and 9(very hard, 8-speeds)
+var gameDifficulty = 4;
 
-var win = function() {
-    stats.incrementStreak();
-    player = new Player();
+/********* Global Functions and Helpers *********/
+
+// Helper function: Get random integer in [min, max)
+var getRandomInt = function(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
 };
+
+// Global win function, call when a win condition is reached
+var win = function(currentPlayer) {
+    stats.incrementStreak();
+    currentPlayer.setInitialPosition();
+};
+
+// Loop through allEnemies and check for collisions with player
+// If any collision, player dies
+var checkCollisions = function() {
+    allEnemies.forEach(function(enemy) {
+        if (checkCollision(enemy, player)) {
+            player.die();
+        }
+    });
+};
+
+// Check for collision by calculating rectange intersection
+// Integer value offsets are used to make rectangles more closely represent
+// the rectangle around the visible pixels
+var checkCollision = function(e, p) {
+    var eLeft = e.x;
+    var eRight = e.x + COLWIDTH;
+    var eTop = e.y + 65;
+    var eBottom = e.y + ROWHEIGHT - 30;
+    var pLeft = p.x + 30;
+    var pRight = p.x + COLWIDTH - 30;
+    var pTop = p.y + 45;
+    var pBottom = p.y + ROWHEIGHT;
+    return !(pLeft > eRight || pRight < eLeft || pTop > eBottom || pBottom < eTop);
+
+};
+
+/********* Game Object Class Definitions *********/
 
 // Enemies our player must avoid
 var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
+    // The image/sprite for our enemies,
+    // Uses a helper to easily load images
     this.sprite = 'images/enemy-bug.png';
+
+    // Initialize properties
     this.x = 0;
     this.y = 0;
     this.speed = 100;
 
+    // Set properties randomly: x, y, and speed
     this.setRandomValues();
 };
 
-// Get random integer in [min, max)
-var getRandomInt = function(min, max) {
-    return Math.floor(Math.random() * (max - min) + min);
+// Call upon initialization and when enemies loop back to start
+Enemy.prototype.setRandomValues = function() {
+
+    // Set enemy starting x position 1 to 3 columns offscreen to the left
+    // This makes enemy "respawn times" less predictable
+    this.x = getRandomInt(1, 4) * -COLWIDTH;
+
+    // Choose random lane
+    this.y = getRandomInt(1, numLanes + 1) * ROWHEIGHT + dy;
+
+    // Speed is randomized, but quantized so that players can get used
+    // to the different possible speeds of enemies
+    // Increasing gameDifficulty by 1 increases number of possible speeds by 1
+    // and increases the highest possible speed by 50
+    this.speed = baseEnemySpeed + 50 * getRandomInt(1, gameDifficulty + 1);
 };
 
 // Update the enemy's position, required method for game
@@ -42,7 +126,9 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 
-    if (this.x < tileWidth * 5) {
+    // Advance enemy position based on speed
+    // If off the map, loop back around and roll new values
+    if (this.x < COLWIDTH * numCols) {
         this.x += dt * this.speed;
     } else {
         this.setRandomValues();
@@ -54,92 +140,80 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-Enemy.prototype.setRandomValues = function() {
-    this.x = getRandomInt(1,4) * -tileWidth;
-    this.y = getRandomInt(1,4) * tileHeight + dy;
-    this.speed = baseEnemySpeed + 50 * getRandomInt(1, gameDifficulty + 1);
-}
-
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
+// The user-controlled player
 var Player = function() {
     this.sprite = 'images/char-boy.png';
-    this.x = playerStartCol * tileWidth;
-    this.y = playerStartRow * tileHeight + dy;
+    this.setInitialPosition();
 };
 
+// (Re)set player to start position
+// Call upon initialization and when a player dies or wins
+Player.prototype.setInitialPosition = function() {
+    this.x = PLAYER_START_COL * COLWIDTH;
+    this.y = PLAYER_START_ROW * ROWHEIGHT + dy;
+};
+
+// Check for win condition and call win() appropriately
 Player.prototype.update = function() {
     if (this.getCurrentRow() < 1) {
-        win();
+        win(this);
     }
 };
 
+// Draw player sprite to canvas
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+// Input handler
+// Allow player to move with keyboard arrow keys
+// and contain player within game boundaries
 Player.prototype.handleInput = function(direction) {
     switch(direction) {
         case "left":
-            if (this.getCurrentColumn() > 0) {
-                this.x -= tileWidth;
+            if (this.getCurrentCol() > 0) {
+                this.x -= COLWIDTH;
             }
             break;
         case "right":
-            if (this.getCurrentColumn() < 4) {
-                this.x += tileWidth;
+            if (this.getCurrentCol() < numCols - 1) {
+                this.x += COLWIDTH;
             }
             break;
         case "up":
             if (this.getCurrentRow() > 0) {
-                this.y -= tileHeight;
+                this.y -= ROWHEIGHT;
             }
             break;
         case "down":
-            if (this.getCurrentRow() < 5) {
-                this.y += tileHeight;
+            if (this.getCurrentRow() < numRows - 1) {
+                this.y += ROWHEIGHT;
             }
             break;
     }
 };
 
-Player.prototype.getCurrentColumn = function() {
-    return this.x / tileWidth;
+// Calculate current player column from x value
+Player.prototype.getCurrentCol = function() {
+    return this.x / COLWIDTH;
 };
 
+// Calculate current player row from y value
 Player.prototype.getCurrentRow = function() {
-    return (this.y - dy) / tileHeight;
+    return (this.y - dy) / ROWHEIGHT;
 };
 
+// Player death handler
 Player.prototype.die = function() {
     stats.resetStreak();
-    player = new Player();
+    this.setInitialPosition();
 };
 
-var checkCollisions = function() {
-    allEnemies.forEach(function(enemy) {
-        checkCollision(enemy, player) ? player.die() : 1;
-    })
-};
+/********* Instantiate Game Objects *********/
 
-var checkCollision = function(e, p) {
-    var eLeft = e.x;
-    var eRight = e.x + tileWidth;
-    var eTop = e.y + 65;
-    var eBottom = e.y + tileHeight - 30;
-    var pLeft = p.x + 30;
-    var pRight = p.x + tileWidth - 30;
-    var pTop = p.y + 45;
-    var pBottom = p.y + tileHeight;
-    return !(pLeft > eRight || pRight < eLeft || pTop > eBottom || pBottom < eTop);
-
-};
-
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+// Game Engine Expects:
+//   * All 'Enemy' objects in an 'allEnemies' array
+//   * A single Player object in 'player' variable
 
 var player = new Player();
 
@@ -148,14 +222,21 @@ for (var i = 0; i < numEnemies; i++) {
     allEnemies.push(new Enemy());
 }
 
-var stats = {
-    streakX: 505 - 35,
-    streakY: 606 - 80,
-    streak: 0
+/********* Define and Initialize Game Stat Display Objects *********/
+
+// Game Stats constructor function
+var Stats = function(streakDisplayPositionX, streakDisplayPositionY) {
+    // Where to display current streak
+    this.streakX = streakDisplayPositionX;
+    this.streakY = streakDisplayPositionY;
+
+    // Initialize current streak to 0
+    this.streak = 0;
 };
-stats.incrementStreak = function() { this.streak++; };
-stats.resetStreak = function() { this.streak = 0; };
-stats.render = function() {
+
+Stats.prototype.incrementStreak = function() { this.streak++; };
+Stats.prototype.resetStreak = function() { this.streak = 0; };
+Stats.prototype.render = function() {
     ctx.font = "36pt Impact";
     ctx.strokeStyle = "black";
     ctx.fillStyle = "white";
@@ -163,6 +244,12 @@ stats.render = function() {
     ctx.strokeText(stats.streak, stats.streakX, stats.streakY);
     ctx.fillText(stats.streak, stats.streakX, stats.streakY);
 };
+
+// Initialize stats object
+// Integer offsets ensure streak is positioned on game screen
+var stats = new Stats(canvasWidth - 70, canvasHeight - 70);
+
+/********* Set Event Listeners *********/
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.

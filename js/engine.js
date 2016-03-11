@@ -25,8 +25,9 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime;
 
-    canvas.width = 505;
-    canvas.height = 606;
+    // canvas.width = 505;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     doc.body.appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
@@ -104,20 +105,28 @@ var Engine = (function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
-        /* This array holds the relative URL to the image used
-         * for that particular row of the game level.
-         */
-        var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
-            ],
-            numRows = 6,
-            numCols = 5,
-            row, col;
+
+        // Set the relative URLs for the three game tile types
+        var goalBlock = 'images/water-block.png';
+        var laneBlock = 'images/stone-block.png';
+        var safeBlock = 'images/grass-block.png';
+
+        // This array holds the relative URL to the image used
+        // for that particular row of the game level.
+        var rowImages = [];
+
+        // Use goalblock for top row
+        rowImages.push(goalBlock);
+
+        // Use laneBlock for each lane
+        for (var i = 0; i < numLanes; i++) {
+            rowImages.push(laneBlock);
+        }
+
+        // Use safeBlocks for bottom two rows
+        rowImages.push(safeBlock, safeBlock);
+
+        var row, col;
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
