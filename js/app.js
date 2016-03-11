@@ -18,8 +18,8 @@ var TILEHEIGHT = 171;
 
 // Change these values to adjust the size of the game
 // Note: This will also increase the canvas size
-var numLanes = 4;
-var numCols = 9;
+var numLanes = 5;
+var numCols = 7;
 
 // Do not modify
 // Always 1 top row (goal) and two bottom rows (player spawn / safe)
@@ -30,8 +30,8 @@ var canvasWidth = numCols * COLWIDTH;
 var canvasHeight = (numRows * ROWHEIGHT) + TILETOP + TILEBOTTOM;
 
 // Player should start on the bottom row, middle column
-var PLAYER_START_COL = Math.floor(numCols / 2);
-var PLAYER_START_ROW = numRows - 1;
+var playerStartCol = Math.floor(numCols / 2);
+var PlayerStartRow = numRows - 1;
 
 // Vertical adjustment to center sprites in tiles
 var dy = -26;
@@ -86,28 +86,56 @@ var checkCollision = function(e, p) {
 
 /********* Game Object Class Definitions *********/
 
+var Entity = function() {
+    this.x = 0;
+    this.y = 0;
+};
+
+Entity.prototype.update = function() {};
+Entity.prototype.render = function() {};
+
+
+// Class to represent all game entities with an image representation
+var GraphicEntity = function(spritePath) {
+    Entity.call(this);
+
+    // The image/sprite for the entity
+    // Uses a helper to easily load images
+    this.sprite = spritePath;
+};
+
+// Set up prototype relation with Entity class
+GraphicEntity.prototype = Object.create(Entity.prototype);
+GraphicEntity.prototype.constructor = GraphicEntity;
+
+// Render image to the screen based on x and y position
+GraphicEntity.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
 // Enemies our player must avoid
 var Enemy = function() {
 
-    // The image/sprite for our enemies,
-    // Uses a helper to easily load images
-    this.sprite = 'images/enemy-bug.png';
+    // Inherit properties from GraphicEntity class
+    GraphicEntity.call(this, 'images/enemy-bug.png');
 
-    // Initialize properties
-    this.x = 0;
-    this.y = 0;
+    // Set to arbitrary nonzero value – will be overwritten
     this.speed = 100;
 
     // Set properties randomly: x, y, and speed
     this.setRandomValues();
 };
 
+// Set up prototype relation with GraphicEntity class
+Enemy.prototype = Object.create(GraphicEntity.prototype);
+Enemy.prototype.constructor = Enemy;
+
 // Call upon initialization and when enemies loop back to start
 Enemy.prototype.setRandomValues = function() {
 
-    // Set enemy starting x position 1 to 3 columns offscreen to the left
-    // This makes enemy "respawn times" less predictable
-    this.x = getRandomInt(1, 4) * -COLWIDTH;
+    // Set enemy starting x position a variable distance offscreen to the left
+    // This makes enemy (re)spawn times less predictable
+    this.x = getRandomInt(1, numCols) * -COLWIDTH;
 
     // Choose random lane
     this.y = getRandomInt(1, numLanes + 1) * ROWHEIGHT + dy;
@@ -135,22 +163,21 @@ Enemy.prototype.update = function(dt) {
     }
 };
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-// The user-controlled player
+// The user-controlled player class
 var Player = function() {
-    this.sprite = 'images/char-boy.png';
+    GraphicEntity.call(this, 'images/char-boy.png');
     this.setInitialPosition();
 };
+
+// Set up prototype relation with GraphicEntity class
+Player.prototype = Object.create(GraphicEntity.prototype);
+Player.prototype.constructor = Player;
 
 // (Re)set player to start position
 // Call upon initialization and when a player dies or wins
 Player.prototype.setInitialPosition = function() {
-    this.x = PLAYER_START_COL * COLWIDTH;
-    this.y = PLAYER_START_ROW * ROWHEIGHT + dy;
+    this.x = playerStartCol * COLWIDTH;
+    this.y = PlayerStartRow * ROWHEIGHT + dy;
 };
 
 // Check for win condition and call win() appropriately
@@ -158,11 +185,6 @@ Player.prototype.update = function() {
     if (this.getCurrentRow() < 1) {
         win(this);
     }
-};
-
-// Draw player sprite to canvas
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 // Input handler
