@@ -48,6 +48,8 @@ var Engine = (function(global) {
         update(dt);
         render();
 
+        if (pendingReset) { reset(); }
+
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
          */
@@ -105,7 +107,7 @@ var Engine = (function(global) {
      */
     function render() {
 
-        // Set the relative URLs for the three game tile types
+        // Set the relative paths or URLs for the three game-tile types
         var goalBlock = 'images/water-block.png';
         var laneBlock = 'images/stone-block.png';
         var safeBlock = 'images/grass-block.png';
@@ -163,12 +165,11 @@ var Engine = (function(global) {
         stats.render();     // renders streak information
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
-     */
     function reset() {
-        // noop
+        canvas.width = CONFIG.getCanvasWidth();
+        canvas.height = CONFIG.getCanvasHeight();
+        setOrResetGameObjects();
+        pendingReset = false;
     }
 
     /* Go ahead and load all of the images we know we're going to need to

@@ -1,7 +1,8 @@
 /**
  * Initializes, Encapsulates, and Calculates all configurations,
  * provides safe access methods for configs to app and game engine <br>
- * Stores data in private closure scope: {@link module:CONFIG~settings}
+ * Stores data in private closure scope: {@link module:CONFIG~settings} <br>
+ * Implements an adaptation of Crockford's "Revealing Module Pattern"
  * @module CONFIG
  */
 var CONFIG = CONFIG || (function(){
@@ -12,7 +13,7 @@ var CONFIG = CONFIG || (function(){
     /**
      * Private holder for game settings (not accessible outside closure scope) <br>
      * Values set by CONFIG.init() <br>
-     * All 'getter' methods pull from here
+     * All 'getter' methods pull data from here
      * @alias module:CONFIG~settings
      */
     var  settings = {
@@ -24,56 +25,68 @@ var CONFIG = CONFIG || (function(){
         dy: -26
     };
 
-    function getColWidth() {
-        return settings.colWidth;
-    }
+    /* Getters */
 
-    function getRowHeight() {
-        return settings.rowHeight;
-    }
+    function getColWidth() { return settings.colWidth; }
 
-    function getDY() {
-        return settings.dy;
-    }
+    function getRowHeight() { return settings.rowHeight; }
 
-    function getNumLanes() {
-        return settings.numLanes;
-    }
+    function getDY() { return settings.dy; }
 
-    function getNumCols() {
-        return settings.numCols;
-    }
+    function getNumLanes() { return settings.numLanes; }
 
-    function getNumEnemies() {
-        return settings.numEnemies;
-    }
+    function getNumCols() { return settings.numCols; }
 
-    function getBaseEnemySpeed() {
-        return settings.baseEnemySpeed;
-    }
+    function getNumEnemies() { return settings.numEnemies; }
 
-    function getGameDifficulty() {
-        return settings.gameDifficulty;
-    }
+    function getBaseEnemySpeed() { return settings.baseEnemySpeed; }
 
-    function getNumRows() {
-        return settings.numLanes + 3;
-    }
+    function getGameDifficulty() { return settings.gameDifficulty; }
 
-    function getCanvasWidth() {
-        return settings.numCols * settings.colWidth;
-    }
+    function getNumRows() { return settings.numLanes + 3; }
+
+    function getCanvasWidth() { return settings.numCols * settings.colWidth; }
 
     function getCanvasHeight() {
         return getNumRows() * settings.rowHeight + settings.tileTop + settings.tileBottom;
     }
 
-    function getPlayerStartCol() {
-        return Math.floor(settings.numCols / 2);
+    function getPlayerStartCol() { return Math.floor(settings.numCols / 2); }
+
+    function getPlayerStartRow() { return getNumRows() - 1; }
+
+    /* Setters */
+
+    function incrementGameDifficulty() {
+        if (settings.gameDifficulty < 9) { return ++settings.gameDifficulty; }
     }
 
-    function getPlayerStartRow() {
-        return getNumRows() - 1;
+    function decrementGameDifficulty() {
+        if (settings.gameDifficulty > 2) { return --settings.gameDifficulty; }
+    }
+
+    function incrementNumEnemies() {
+        if (settings.numEnemies < 20) { return ++settings.numEnemies; }
+    }
+
+    function decrementNumEnemies() {
+        if (settings.numEnemies > 2) { return --settings.numEnemies; }
+    }
+
+    function incrementNumLanes() {
+        if (settings.numLanes < 5) { return ++settings.numLanes; }
+    }
+
+    function decrementNumLanes() {
+        if (settings.numLanes > 1) { return --settings.numLanes; }
+    }
+
+    function incrementNumCols() {
+        if (settings.numCols < 11) { return ++settings.numCols; }
+    }
+
+    function decrementNumCols() {
+        if (settings.numCols > 2) {return --settings.numCols; }
     }
 
     /** @lends module:CONFIG */
@@ -179,7 +192,40 @@ var CONFIG = CONFIG || (function(){
          * Get the Row in which the player should start
          * @returns {number}
          */
-        getPlayerStartRow: getPlayerStartRow
+        getPlayerStartRow: getPlayerStartRow,
+
+
+        /**
+         * Increase game difficulty by 1
+         * @returns {number} Updated game difficulty
+         */
+        incrementGameDifficulty: incrementGameDifficulty,
+
+        /**
+         * Decrease game difficulty by 1
+         * @returns {number} Updated game difficulty
+         */
+        decrementGameDifficulty: decrementGameDifficulty,
+
+        /**
+         * Increase number of enemies by 1
+         * @returns {number} Updated number of enemies
+         */
+        incrementNumEnemies: incrementNumEnemies,
+
+        /**
+         * Decrease number of enemies by 1
+         * @returns {number} Updated number of enemies
+         */
+        decrementNumEnemies: decrementNumEnemies,
+
+        incrementNumLanes: incrementNumLanes,
+
+        decrementNumLanes: decrementNumLanes,
+
+        incrementNumCols: incrementNumCols,
+
+        decrementNumCols: decrementNumCols
 
     };
 

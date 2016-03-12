@@ -20,7 +20,7 @@ var getRandomInt = function(min, max) {
 };
 
 /**
- * Loop through an array of enemies, check for collisions with player, and
+ * Loop through allEnemies, check for collisions with player, and
  * respond appropriately
  * @param {Array.<Enemy>} enemyArray - An array of Enemy objects
  * @param {Player} playerInstance - An instance of the Player class
@@ -217,7 +217,7 @@ Player.prototype.setInitialPosition = function() {
 };
 
 /**
- * Check for win condition and call win() appropriately
+ * Check for win condition
  * @returns {undefined}
  */
 Player.prototype.update = function() {
@@ -343,41 +343,88 @@ Stats.prototype.render = function() {
     ctx.fillText(this.streak, this.streakX, this.streakY);
 };
 
-/********* Instantiate Game Objects *********/
-
-// Game Engine Expects:
-//   * An initialized CONFIG module
-//   * All 'Enemy' instances in an 'allEnemies' array
-//   * A single Player instance bound to a global vairable named 'player'
-//   * A single Stats instance bound to a global vairable named 'stats'
-
-/* Initialize Config Object */
-CONFIG.init(5, 7, 10, 200, 4);
-
 /**
- * Global player instance
+ * Global Player instance
  * @type {Player}
  * @global
  */
-var player = new Player();
+var player;
+
 
 /**
  * Global {@link Enemy} array
  * @type {Enemy[]}
  * @global
  */
-var allEnemies = [];
-for (var i = 0; i < CONFIG.getNumEnemies(); i++) {
-    allEnemies.push(new Enemy());
-}
+var allEnemies;
+
 
 /**
- * Global Stats instance
+ * Global Stats object
  * @type {Stats}
  * @global
  */
-var stats = new Stats(CONFIG.getCanvasWidth() - 70, CONFIG.getCanvasHeight() - 70);
+var stats;
 
+/**
+ * Creates or re-initializes the following global variables
+ * (All of which are expected to exist by game engine) <br>
+ * An initialized CONFIG module <br>
+ * All 'Enemy' instances in an 'allEnemies' array <br>
+ * A single Player instance bound to a global vairable named 'player' <br>
+ * A single Stats instance bound to a global vairable named 'stats' <br>
+ * (Note: Uses default values)
+ * @function
+ * @global
+ */
+var setOrResetGameObjects = function() {
+
+    /* Initialize Config Object to default values if not yet initialized
+     * CONFIG.getNumLanes() will return undefined if CONFIG hasn't been initialized
+     */
+    if (!CONFIG.getNumLanes()) { CONFIG.init(5, 7, 10, 200, 4); }
+
+    /* If global 'player' variable exists, reset player to initial position
+     * else, bind 'player' to a new Player instance
+     */
+
+    player = (player && player.setInitialPosition()) || new Player();
+
+    /* Dump global allEnemies[] and repopulate it */
+
+    allEnemies = [];
+    for (var i = 0; i < CONFIG.getNumEnemies(); i++) {
+        allEnemies.push(new Enemy());
+    }
+
+    /* Create or replace Stats instance in global 'stats' variable */
+
+    stats = new Stats(CONFIG.getCanvasWidth() - 70, CONFIG.getCanvasHeight() - 70);
+};
+
+setOrResetGameObjects();
+
+/* Create buttons */
+
+var pendingReset;
+
+arr = [
+    "incrementNumEnemies", "decrementNumEnemies", "incrementGameDifficulty",
+    "decrementGameDifficulty", "incrementNumLanes", "decrementNumLanes",
+    "incrementNumCols", "decrementNumCols"
+];
+
+arr.forEach(function(e){
+
+    var cb = function(){
+        console.log(CONFIG[e]());
+        pendingReset = true;
+    };
+    var btn = document.createElement('button');
+    btn.innerText = e;
+    document.body.appendChild(btn);
+    btn.onclick = cb;
+});
 
 /********* Set Event Listeners *********/
 

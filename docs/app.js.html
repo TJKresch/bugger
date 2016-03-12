@@ -245,7 +245,7 @@ Player.prototype.setInitialPosition = function() {
 };
 
 /**
- * Check for win condition and call win() appropriately
+ * Check for win condition
  * @returns {undefined}
  */
 Player.prototype.update = function() {
@@ -371,23 +371,13 @@ Stats.prototype.render = function() {
     ctx.fillText(this.streak, this.streakX, this.streakY);
 };
 
-/********* Instantiate Game Objects *********/
-
-// Game Engine Expects:
-//   * An initialized CONFIG module
-//   * All 'Enemy' instances in an 'allEnemies' array
-//   * A single Player instance bound to a global vairable named 'player'
-//   * A single Stats instance bound to a global vairable named 'stats'
-
-/* Initialize Config Object */
-CONFIG.init(5, 7, 10, 200, 4);
-
 /**
- * Global player instance
+ * Global Player instance
  * @type {Player}
  * @global
  */
-var player = new Player();
+var player;
+
 
 /**
  * Global {@link Enemy} array
@@ -395,18 +385,75 @@ var player = new Player();
  * @type {Enemy[]}
  * @global
  */
-var allEnemies = [];
-for (var i = 0; i &lt; CONFIG.getNumEnemies(); i++) {
-    allEnemies.push(new Enemy());
-}
+var allEnemies;
+
 
 /**
- * Global Stats instance
+ * Global Stats object
  * @type {Stats}
  * @global
  */
-var stats = new Stats(CONFIG.getCanvasWidth() - 70, CONFIG.getCanvasHeight() - 70);
+var stats;
 
+/**
+ * Creates or re-initializes the following global variables
+ * (All of which are expected to exist by game engine) &lt;br>
+ * An initialized CONFIG module &lt;br>
+ * All 'Enemy' instances in an 'allEnemies' array &lt;br>
+ * A single Player instance bound to a global vairable named 'player' &lt;br>
+ * A single Stats instance bound to a global vairable named 'stats' &lt;br>
+ * (Note: Uses default values)
+ * @function
+ * @global
+ */
+var setOrResetGameObjects = function() {
+
+    /* Initialize Config Object to default values if not yet initialized
+     * CONFIG.getNumLanes() will return undefined if CONFIG hasn't been initialized
+     */
+    if (!CONFIG.getNumLanes()) { CONFIG.init(5, 7, 10, 200, 4); }
+
+    /* If global 'player' variable exists, reset player to initial position
+     * else, bind 'player' to a new Player instance
+     */
+
+    player = (player &amp;&amp; player.setInitialPosition()) || new Player();
+
+    /* Dump global allEnemies[] and repopulate it */
+
+    allEnemies = [];
+    for (var i = 0; i &lt; CONFIG.getNumEnemies(); i++) {
+        allEnemies.push(new Enemy());
+    }
+
+    /* Create or replace Stats instance in global 'stats' variable */
+
+    stats = new Stats(CONFIG.getCanvasWidth() - 70, CONFIG.getCanvasHeight() - 70);
+};
+
+setOrResetGameObjects();
+
+/* Create buttons */
+
+var pendingReset;
+
+arr = [
+    "incrementNumEnemies", "decrementNumEnemies", "incrementGameDifficulty",
+    "decrementGameDifficulty", "incrementNumLanes", "decrementNumLanes",
+    "incrementNumCols", "decrementNumCols"
+];
+
+arr.forEach(function(e){
+
+    var cb = function(){
+        console.log(CONFIG[e]());
+        pendingReset = true;
+    }
+    var btn = document.createElement('button');
+    btn.innerText = e;
+    document.body.appendChild(btn);
+    btn.onclick = cb;
+});
 
 /********* Set Event Listeners *********/
 
@@ -432,7 +479,7 @@ document.addEventListener('keyup', function(e) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-CONFIG.html">CONFIG</a></li></ul><h3>Classes</h3><ul><li><a href="Enemy.html">Enemy</a></li><li><a href="Entity.html">Entity</a></li><li><a href="GraphicEntity.html">GraphicEntity</a></li><li><a href="Player.html">Player</a></li><li><a href="Stats.html">Stats</a></li></ul><h3>Global</h3><ul><li><a href="global.html#allEnemies">allEnemies</a></li><li><a href="global.html#checkCollision">checkCollision</a></li><li><a href="global.html#checkCollisions">checkCollisions</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#player">player</a></li><li><a href="global.html#stats">stats</a></li><li><a href="global.html#win">win</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-CONFIG.html">CONFIG</a></li></ul><h3>Classes</h3><ul><li><a href="Enemy.html">Enemy</a></li><li><a href="Entity.html">Entity</a></li><li><a href="GraphicEntity.html">GraphicEntity</a></li><li><a href="Player.html">Player</a></li><li><a href="Stats.html">Stats</a></li></ul><h3>Global</h3><ul><li><a href="global.html#allEnemies">allEnemies</a></li><li><a href="global.html#checkCollision">checkCollision</a></li><li><a href="global.html#checkCollisions">checkCollisions</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#player">player</a></li><li><a href="global.html#setOrResetGameObjects">setOrResetGameObjects</a></li><li><a href="global.html#stats">stats</a></li></ul>
 </nav>
 
 <br class="clear">
