@@ -6,107 +6,6 @@
  * and updating object values to be used by the rendering engine.
  */
 
-/********* Constants and Global Variables *********/
-
-/**
- * @namespace CONFIG
- * @description Calculate and hold all configurations
- */
-var CONFIG = CONFIG || (function(){
-
-    // Constant values refer to current tileset
-    // will need to be updated if different sized tiles (images) are used
-
-    var  settings = {
-        colWidth: 101,
-        rowHeight: 83,
-        tileBottom: 37,
-        tileTop: 51,
-        tileHeight: 171,
-        dy: -26
-    };
-
-    function getColWidth() {
-        return settings.colWidth;
-    }
-
-    function getRowHeight() {
-        return settings.rowHeight;
-    }
-
-    function getDY() {
-        return settings.dy;
-    }
-
-    function getNumLanes() {
-        return settings.numLanes;
-    }
-
-    function getNumCols() {
-        return settings.numCols;
-    }
-
-    function getNumEnemies() {
-        return settings.numEnemies;
-    }
-
-    function getBaseEnemySpeed() {
-        return settings.baseEnemySpeed;
-    }
-
-    function getGameDifficulty() {
-        return settings.gameDifficulty;
-    }
-
-    function getNumRows() {
-        return settings.numLanes + 3;
-    }
-
-    function getCanvasWidth() {
-        return settings.numCols * settings.colWidth;
-    }
-
-    function getCanvasHeight() {
-        return getNumRows() * settings.rowHeight + settings.tileTop + settings.tileBottom;
-    }
-
-    function getPlayerStartCol() {
-        return Math.floor(settings.numCols / 2);
-    }
-
-    function getPlayerStartRow() {
-        return getNumRows() - 1;
-    }
-
-    return ({
-        init: function(numLanes, numCols, numEnemies, baseEnemySpeed, gameDifficulty) {
-            settings.numLanes = numLanes;
-            settings.numCols = numCols;
-            settings.numEnemies = numEnemies;
-            settings.baseEnemySpeed = baseEnemySpeed;
-            settings.gameDifficulty = gameDifficulty;
-        },
-        getColWidth: getColWidth,
-        getRowHeight: getRowHeight,
-        getDY: getDY,
-
-        getNumLanes: getNumLanes,
-        getNumCols: getNumCols,
-        getNumEnemies: getNumEnemies,
-        getBaseEnemySpeed: getBaseEnemySpeed,
-        getGameDifficulty: getGameDifficulty,
-
-        getNumRows: getNumRows,
-        getCanvasWidth: getCanvasWidth,
-        getCanvasHeight: getCanvasHeight,
-        getPlayerStartCol: getPlayerStartCol,
-        getPlayerStartRow: getPlayerStartRow
-
-    });
-}());
-
-CONFIG.init(5, 7, 10, 200, 4);
-
 /********* Global Functions and Helpers *********/
 
 /**
@@ -158,7 +57,6 @@ var checkCollision = function(e, p) {
     var pTop = p.y + 45;
     var pBottom = p.y + CONFIG.getRowHeight();
     return !(pLeft > eRight || pRight < eLeft || pTop > eBottom || pBottom < eTop);
-
 };
 
 /********* Game Object Class Definitions *********/
@@ -181,6 +79,7 @@ var Entity = function() {
  * Update internal state
  * @method
  * @returns {undefined}
+ * @abstract
  */
 Entity.prototype.update = function() {};
 
@@ -188,9 +87,9 @@ Entity.prototype.update = function() {};
  * Render to Canvas
  * @method
  * @returns {undefined}
+ * @abstract
  */
 Entity.prototype.render = function() {};
-
 
 /**
  * Inherits from Entity and adds functionality for displaying a sprite
@@ -397,21 +296,6 @@ Player.prototype.win = function() {
     this.setInitialPosition();
 };
 
-/********* Instantiate Game Objects *********/
-
-// Game Engine Expects:
-//   * All 'Enemy' objects in an 'allEnemies' array
-//   * A single Player object in 'player' variable
-
-var player = new Player();
-
-var allEnemies = [];
-for (var i = 0; i < CONFIG.getNumEnemies(); i++) {
-    allEnemies.push(new Enemy());
-}
-
-/********* Define and Initialize Game Stat Display Objects *********/
-
 /**
  * Game Stats constructor function
  * @constructor
@@ -462,12 +346,16 @@ Stats.prototype.render = function() {
 /********* Instantiate Game Objects *********/
 
 // Game Engine Expects:
-//   * All 'Enemy' objects in an 'allEnemies' array
-//   * A single Player object in 'player' variable
-//   * A single Stats object in 'stats' variable
+//   * An initialized CONFIG module
+//   * All 'Enemy' instances in an 'allEnemies' array
+//   * A single Player instance bound to a global vairable named 'player'
+//   * A single Stats instance bound to a global vairable named 'stats'
+
+/* Initialize Config Object */
+CONFIG.init(5, 7, 10, 200, 4);
 
 /**
- * Current Player instance
+ * Global player instance
  * @type {Player}
  * @global
  */
@@ -475,11 +363,11 @@ var player = new Player();
 
 /**
  * Global {@link Enemy} array
- * @type {Array.<Enemy>}
+ * @type {Enemy[]}
  * @global
  */
 var allEnemies = [];
-for (var i = 0; i < numEnemies; i++) {
+for (var i = 0; i < CONFIG.getNumEnemies(); i++) {
     allEnemies.push(new Enemy());
 }
 
@@ -489,6 +377,7 @@ for (var i = 0; i < numEnemies; i++) {
  * @global
  */
 var stats = new Stats(CONFIG.getCanvasWidth() - 70, CONFIG.getCanvasHeight() - 70);
+
 
 /********* Set Event Listeners *********/
 
