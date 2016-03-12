@@ -25,9 +25,8 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime;
 
-    // canvas.width = 505;
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = CONFIG.getCanvasWidth();
+    canvas.height = CONFIG.getCanvasHeight();
     doc.body.appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
@@ -119,7 +118,7 @@ var Engine = (function(global) {
         rowImages.push(goalBlock);
 
         // Use laneBlock for each lane
-        for (var i = 0; i < numLanes; i++) {
+        for (var i = 0; i < CONFIG.getNumLanes(); i++) {
             rowImages.push(laneBlock);
         }
 
@@ -132,8 +131,8 @@ var Engine = (function(global) {
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
+        for (row = 0; row < CONFIG.getNumRows(); row++) {
+            for (col = 0; col < CONFIG.getNumCols(); col++) {
                 /* The drawImage function of the canvas' context element
                  * requires 3 parameters: the image to draw, the x coordinate
                  * to start drawing and the y coordinate to start drawing.

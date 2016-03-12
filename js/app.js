@@ -8,155 +8,104 @@
 
 /********* Constants and Global Variables *********/
 
-// Constant values refer to current tileset
-// will need to be updated if different sized tiles (images) are used
-
 /**
- * Height of the bottom part of the tile image that should be covered
- * by overlapping tiles in all except the bottom row
- * @type {Number}
- * @const
- * @global
+ * @namespace CONFIG
+ * @description Calculate and hold all configurations
  */
-var TILEBOTTOM = 37;
+var CONFIG = CONFIG || (function(){
 
-/**
- * Height of the top part of the tile image, most of which is
- * transparent
- * @type {Number}
- * @const
- * @global
- */
-var TILETOP = 51;
+    // Constant values refer to current tileset
+    // will need to be updated if different sized tiles (images) are used
 
-/**
- * Height of the full tile image
- * @type {Number}
- * @const
- * @global
- */
-var TILEHEIGHT = 171;
+    var  settings = {
+        colWidth: 101,
+        rowHeight: 83,
+        tileBottom: 37,
+        tileTop: 51,
+        tileHeight: 171,
+        dy: -26
+    };
 
-/**
- * Height of a column (Note: NOT the same as the height of the tile
- * image. Takes into account the overlapping of tiles.)
- * @type {Number}
- * @const
- * @global
- */
-var ROWHEIGHT = TILEHEIGHT - TILETOP - TILEBOTTOM;
+    function getColWidth() {
+        return settings.colWidth;
+    }
 
-/**
- * Width of column (should be equal to width of tile image)
- * @type {Number}
- * @const
- * @global
- */
-var COLWIDTH = 101;
+    function getRowHeight() {
+        return settings.rowHeight;
+    }
 
-/**
- * Number of lanes to be used in the game. Changing this value will
- * adjust the height of the game (and the canvas)
- * @type {Number}
- * @global
- */
-var numLanes = 4;
+    function getDY() {
+        return settings.dy;
+    }
 
-/**
- * Number of Columns to be used in the game. Changing this value
- * will adjust the width of the game (and the canvas)
- * @type {Number}
- * @global
- */
-var numCols = 7;
+    function getNumLanes() {
+        return settings.numLanes;
+    }
 
+    function getNumCols() {
+        return settings.numCols;
+    }
 
-// Always 1 top row (goal) and two bottom rows (player spawn / safe)
+    function getNumEnemies() {
+        return settings.numEnemies;
+    }
 
-/**
- * Number of rows to render, 3 fixed rows + the number of lanes
- * (modify {@link numLanes} to adjust game size)
- * @type {Number}
- * @global
- */
-var numRows = numLanes + 3;
+    function getBaseEnemySpeed() {
+        return settings.baseEnemySpeed;
+    }
 
-/**
- * Holds the width of the canvas, calculated from the number of
- * columns {@link numCols} and the width of each column
- * {@link colWidth} <br>
- * Used by the Game Engine and {@link stats}
- * @type {Number}
- * @global
- */
-var canvasWidth = numCols * COLWIDTH;
+    function getGameDifficulty() {
+        return settings.gameDifficulty;
+    }
 
-/**
- * Holds the width of the canvas, calculated from the number of
- * columns {@link numCols} and the width of each column
- * {@link colWidth}
- * @type {Number}
- * @global
- */
-var canvasHeight = (numRows * ROWHEIGHT) + TILETOP + TILEBOTTOM;
+    function getNumRows() {
+        return settings.numLanes + 3;
+    }
 
-// Player should start on the bottom row, middle column
+    function getCanvasWidth() {
+        return settings.numCols * settings.colWidth;
+    }
 
-/**
- * Calculates the column in which the player should (re)spawn
- * (the middle or middle-right column)
- * @type {Number}
- * @global
- */
-var playerStartCol = Math.floor(numCols / 2);
+    function getCanvasHeight() {
+        return getNumRows() * settings.rowHeight + settings.tileTop + settings.tileBottom;
+    }
 
-/**
- * Calculates the row in which the player should (re)spawn
- * (the bottom row)
- * @type {Number}
- * @global
- */
-var PlayerStartRow = numRows - 1;
+    function getPlayerStartCol() {
+        return Math.floor(settings.numCols / 2);
+    }
 
-/**
- * Vertical adjustment to center sprites in tiles
- * (dependant on current tile set)
- * @type {Number}
- * @global
- */
-var dy = -26;
+    function getPlayerStartRow() {
+        return getNumRows() - 1;
+    }
 
-// Set the number of enemies and the base enemy speed
+    return ({
+        init: function(numLanes, numCols, numEnemies, baseEnemySpeed, gameDifficulty) {
+            settings.numLanes = numLanes;
+            settings.numCols = numCols;
+            settings.numEnemies = numEnemies;
+            settings.baseEnemySpeed = baseEnemySpeed;
+            settings.gameDifficulty = gameDifficulty;
+        },
+        getColWidth: getColWidth,
+        getRowHeight: getRowHeight,
+        getDY: getDY,
 
-/**
- * Set the total number of enemies to spawn here
- * @type {Number}
- * @global
- */
-var numEnemies = 10;
+        getNumLanes: getNumLanes,
+        getNumCols: getNumCols,
+        getNumEnemies: getNumEnemies,
+        getBaseEnemySpeed: getBaseEnemySpeed,
+        getGameDifficulty: getGameDifficulty,
 
-/**
- * Set the base enemy speed here
- * @type {Number}
- * @global
- */
-var baseEnemySpeed = 200;
+        getNumRows: getNumRows,
+        getCanvasWidth: getCanvasWidth,
+        getCanvasHeight: getCanvasHeight,
+        getPlayerStartCol: getPlayerStartCol,
+        getPlayerStartRow: getPlayerStartRow
 
-// Set the game difficulty
-// This influences the top speed of the enemies, as well as the range of possible speeds
-// Set to any integer between 1 (easy, single-speed) and 9(very hard, 8-speeds)
+    });
+}());
 
-/**
- * Set the game difficulty here <br>
- * This influences the top speed of the enemies, the number of
- * discreet possible speeds, and the maximum possible speed.
- * Set to any integer between: <br>
- * 1 (easy, single-speed, low max speed) and
- * 9(very hard, 9-speeds, high max speed)
- * @type {Number}
- * @global
- */
-var gameDifficulty = 4;
+CONFIG.init(5, 7, 10, 200, 4);
 
 /********* Global Functions and Helpers *********/
 
@@ -201,13 +150,13 @@ var checkCollision = function(e, p) {
      * the rectangle around the visible pixels
     */
     var eLeft = e.x;
-    var eRight = e.x + COLWIDTH;
+    var eRight = e.x + CONFIG.getColWidth();
     var eTop = e.y + 65;
-    var eBottom = e.y + ROWHEIGHT - 30;
+    var eBottom = e.y + CONFIG.getRowHeight() - 30;
     var pLeft = p.x + 30;
-    var pRight = p.x + COLWIDTH - 30;
+    var pRight = p.x + CONFIG.getColWidth() - 30;
     var pTop = p.y + 45;
-    var pBottom = p.y + ROWHEIGHT;
+    var pBottom = p.y + CONFIG.getRowHeight();
     return !(pLeft > eRight || pRight < eLeft || pTop > eBottom || pBottom < eTop);
 
 };
@@ -310,16 +259,16 @@ Enemy.prototype.setRandomValues = function() {
 
     // Set enemy starting x position a variable distance offscreen to the left
     // This makes enemy (re)spawn times less predictable
-    this.x = getRandomInt(1, numCols) * -COLWIDTH;
+    this.x = getRandomInt(1, CONFIG.getNumCols()) * -CONFIG.getColWidth();
 
     // Choose random lane
-    this.y = getRandomInt(1, numLanes + 1) * ROWHEIGHT + dy;
+    this.y = getRandomInt(1, CONFIG.getNumLanes() + 1) * CONFIG.getRowHeight() + CONFIG.getDY();
 
     // Speed is randomized, but quantized so that players can get used
     // to the different possible speeds of enemies
-    // Increasing gameDifficulty by 1 increases number of possible speeds by 1
+    // Increasing Game Difficulty by 1 increases number of possible speeds by 1
     // and increases the highest possible speed by 50
-    this.speed = baseEnemySpeed + 50 * getRandomInt(1, gameDifficulty + 1);
+    this.speed = CONFIG.getBaseEnemySpeed() + 50 * getRandomInt(1, CONFIG.getGameDifficulty() + 1);
 };
 
 /**
@@ -332,7 +281,7 @@ Enemy.prototype.update = function(dt) {
 
     // Advance enemy position based on speed
     // If off the map, loop back around and roll new values
-    if (this.x < COLWIDTH * numCols) {
+    if (this.x < CONFIG.getColWidth() * CONFIG.getNumCols()) {
         this.x += dt * this.speed;
     } else {
         this.setRandomValues();
@@ -364,8 +313,8 @@ Player.prototype.constructor = Player;
  * @returns {undefined}
  */
 Player.prototype.setInitialPosition = function() {
-    this.x = playerStartCol * COLWIDTH;
-    this.y = PlayerStartRow * ROWHEIGHT + dy;
+    this.x = CONFIG.getPlayerStartCol() * CONFIG.getColWidth();
+    this.y = CONFIG.getPlayerStartRow() * CONFIG.getRowHeight() + CONFIG.getDY();
 };
 
 /**
@@ -389,22 +338,22 @@ Player.prototype.handleInput = function(direction) {
     switch(direction) {
         case "left":
             if (this.getCurrentCol() > 0) {
-                this.x -= COLWIDTH;
+                this.x -= CONFIG.getColWidth();
             }
             break;
         case "right":
-            if (this.getCurrentCol() < numCols - 1) {
-                this.x += COLWIDTH;
+            if (this.getCurrentCol() < CONFIG.getNumCols() - 1) {
+                this.x += CONFIG.getColWidth();
             }
             break;
         case "up":
             if (this.getCurrentRow() > 0) {
-                this.y -= ROWHEIGHT;
+                this.y -= CONFIG.getRowHeight();
             }
             break;
         case "down":
-            if (this.getCurrentRow() < numRows - 1) {
-                this.y += ROWHEIGHT;
+            if (this.getCurrentRow() < CONFIG.getNumRows() - 1) {
+                this.y += CONFIG.getRowHeight();
             }
             break;
     }
@@ -416,7 +365,7 @@ Player.prototype.handleInput = function(direction) {
  * @returns {number}
  */
 Player.prototype.getCurrentCol = function() {
-    return this.x / COLWIDTH;
+    return this.x / CONFIG.getColWidth();
 };
 
 /**
@@ -425,7 +374,7 @@ Player.prototype.getCurrentCol = function() {
  * @returns {number}
  */
 Player.prototype.getCurrentRow = function() {
-    return (this.y - dy) / ROWHEIGHT;
+    return (this.y - CONFIG.getDY()) / CONFIG.getRowHeight();
 };
 
 /**
@@ -447,6 +396,21 @@ Player.prototype.win = function() {
     stats.incrementStreak();
     this.setInitialPosition();
 };
+
+/********* Instantiate Game Objects *********/
+
+// Game Engine Expects:
+//   * All 'Enemy' objects in an 'allEnemies' array
+//   * A single Player object in 'player' variable
+
+var player = new Player();
+
+var allEnemies = [];
+for (var i = 0; i < CONFIG.getNumEnemies(); i++) {
+    allEnemies.push(new Enemy());
+}
+
+/********* Define and Initialize Game Stat Display Objects *********/
 
 /**
  * Game Stats constructor function
@@ -524,7 +488,7 @@ for (var i = 0; i < numEnemies; i++) {
  * @type {Stats}
  * @global
  */
-var stats = new Stats(canvasWidth - 70, canvasHeight - 70);
+var stats = new Stats(CONFIG.getCanvasWidth() - 70, CONFIG.getCanvasHeight() - 70);
 
 /********* Set Event Listeners *********/
 
