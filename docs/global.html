@@ -102,7 +102,7 @@
 
 
 <div class="description">
-    Global allEnemies array to hold all Enemy instances
+    Global array to hold all Enemy instances
 </div>
 
 
@@ -150,7 +150,79 @@
 
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line359">line 359</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line477">line 477</a>
+    </li></ul></dd>
+
+
+
+
+
+
+
+</dl>
+
+
+
+
+
+
+
+
+<h4 class="name" id="deaths"><span class="type-signature"></span>deaths<span class="type-signature"> :<a href="TextEntity.html">TextEntity</a></span></h4>
+
+
+
+
+<div class="description">
+    Global Deaths object
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+
+<span class="param-type"><a href="TextEntity.html">TextEntity</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line492">line 492</a>
     </li></ul></dd>
 
 
@@ -222,7 +294,7 @@
 
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line351">line 351</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line469">line 469</a>
     </li></ul></dd>
 
 
@@ -240,13 +312,13 @@
 
 
 
-<h4 class="name" id="stats"><span class="type-signature"></span>stats<span class="type-signature"> :<a href="Stats.html">Stats</a></span></h4>
+<h4 class="name" id="streak"><span class="type-signature"></span>streak<span class="type-signature"> :<a href="TextEntity.html">TextEntity</a></span></h4>
 
 
 
 
 <div class="description">
-    Global Stats object
+    Global Streak object
 </div>
 
 
@@ -255,7 +327,7 @@
     <ul>
         <li>
 
-<span class="param-type"><a href="Stats.html">Stats</a></span>
+<span class="param-type"><a href="TextEntity.html">TextEntity</a></span>
 
 
         </li>
@@ -294,7 +366,7 @@
 
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line367">line 367</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line485">line 485</a>
     </li></ul></dd>
 
 
@@ -312,14 +384,13 @@
 
 
 
-<h4 class="name" id="TILEBOTTOM"><span class="type-signature">(constant) </span>TILEBOTTOM<span class="type-signature"> :Number</span></h4>
+<h4 class="name" id="wins"><span class="type-signature"></span>wins<span class="type-signature"> :<a href="TextEntity.html">TextEntity</a></span></h4>
 
 
 
 
 <div class="description">
-    Height of the bottom part of the tile image that should be covered
-by overlapping tiles in all except the bottom row
+    Global Wins object
 </div>
 
 
@@ -328,11 +399,163 @@ by overlapping tiles in all except the bottom row
     <ul>
         <li>
 
-<span class="param-type">Number</span>
+<span class="param-type"><a href="TextEntity.html">TextEntity</a></span>
 
 
         </li>
     </ul>
+
+
+
+
+
+<dl class="details">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line499">line 499</a>
+    </li></ul></dd>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h4 class="name" id="calculateMaxDimensions"><span class="type-signature"></span>calculateMaxDimensions<span class="signature">(maxWidth, maxHeight, aspectRatio)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+
+
+
+
+<div class="description">
+    Helper function: Calculate the largest rectangle possible while maintaining
+a fixed aspect ratio
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+
+
+<table class="params">
+    <thead>
+    <tr>
+
+        <th>Name</th>
+
+
+        <th>Type</th>
+
+
+
+
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+
+        <tr>
+
+                <td class="name"><code>maxWidth</code></td>
+
+
+            <td class="type">
+
+
+<span class="param-type">number</span>
+
+
+
+            </td>
+
+
+
+
+
+            <td class="description last">The absolute max width allowed, irrespective of aspect ratio</td>
+        </tr>
+
+
+
+        <tr>
+
+                <td class="name"><code>maxHeight</code></td>
+
+
+            <td class="type">
+
+
+<span class="param-type">number</span>
+
+
+
+            </td>
+
+
+
+
+
+            <td class="description last">The absolute max height allowed, irrespective of aspect ratio</td>
+        </tr>
+
+
+
+        <tr>
+
+                <td class="name"><code>aspectRatio</code></td>
+
+
+            <td class="type">
+
+
+<span class="param-type">number</span>
+
+
+
+            </td>
+
+
+
+
+
+            <td class="description last">The desired aspect ratio of the output rectangle: (width / height)</td>
+        </tr>
+
+
+    </tbody>
+</table>
+
 
 
 
@@ -367,7 +590,7 @@ by overlapping tiles in all except the bottom row
 
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line379">line 379</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line70">line 70</a>
     </li></ul></dd>
 
 
@@ -385,155 +608,33 @@ by overlapping tiles in all except the bottom row
 
 
 
-<h4 class="name" id="TILEHEIGHT"><span class="type-signature">(constant) </span>TILEHEIGHT<span class="type-signature"> :Number</span></h4>
 
 
 
 
-<div class="description">
-    Height of the full tile image
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    Object with properties
+<code>width</code> and <code>height</code>, representing dimensions of the output rectange
 </div>
 
 
 
-    <h5>Type:</h5>
-    <ul>
-        <li>
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
 
-<span class="param-type">Number</span>
-
-
-        </li>
-    </ul>
+<span class="param-type">Object</span>
 
 
-
-
-
-<dl class="details">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line44">line 44</a>
-    </li></ul></dd>
-
-
-
-
-
-
-
+    </dd>
 </dl>
 
-
-
-
-
-
-
-
-<h4 class="name" id="TILETOP"><span class="type-signature">(constant) </span>TILETOP<span class="type-signature"> :Number</span></h4>
-
-
-
-
-<div class="description">
-    Height of the top part of the tile image, most of which is
-transparent
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-
-<span class="param-type">Number</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line55">line 55</a>
-    </li></ul></dd>
-
-
-
-
-
-
-
-</dl>
-
-
-
-
-
-
-
-
-
-
-        <h3 class="subsection-title">Methods</h3>
 
 
 
@@ -595,7 +696,6 @@ by calculating rectange intersection
 
 
             </td>
-
 
 
 
@@ -898,12 +998,14 @@ respond appropriately
 
 
 <div class="description">
-    Creates or re-initializes the following global variables
-(All of which are expected to exist by game engine) <br>
-An initialized CONFIG module <br>
-All 'Enemy' instances in an 'allEnemies' array <br>
-A single Player instance bound to a global vairable named 'player' <br>
-A single Stats instance bound to a global vairable named 'stats' <br>
+    Creates or re-initializes the following global variables, all of
+which are expected to exist by game engine: <br>
+<code>CONFIG</code>: An initialized <a href="module-CONFIG.html">module:CONFIG</a> object <br>
+<a href="global.html#allEnemies">allEnemies</a>: All 'Enemy' instances <br>
+<a href="global.html#player">player</a>: Current Player instance <br>
+<a href="global.html#streak">streak</a>: Current Streak UI element <br>
+<a href="global.html#deaths">deaths</a>: Current Deaths UI element
+<a href="global.html#wins">wins</a>:  Current Wins UI element
 (Note: Uses default values)
 </div>
 
@@ -1020,7 +1122,7 @@ A single Stats instance bound to a global vairable named 'stats' <br>
 
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line380">line 380</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line514">line 514</a>
     </li></ul></dd>
 
 
@@ -1084,7 +1186,7 @@ A single Stats instance bound to a global vairable named 'stats' <br>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-CONFIG.html">CONFIG</a></li></ul><h3>Classes</h3><ul><li><a href="Enemy.html">Enemy</a></li><li><a href="Entity.html">Entity</a></li><li><a href="GraphicEntity.html">GraphicEntity</a></li><li><a href="Player.html">Player</a></li><li><a href="Stats.html">Stats</a></li></ul><h3>Global</h3><ul><li><a href="global.html#allEnemies">allEnemies</a></li><li><a href="global.html#checkCollision">checkCollision</a></li><li><a href="global.html#checkCollisions">checkCollisions</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#player">player</a></li><li><a href="global.html#setOrResetGameObjects">setOrResetGameObjects</a></li><li><a href="global.html#stats">stats</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-CONFIG.html">CONFIG</a></li></ul><h3>Classes</h3><ul><li><a href="Enemy.html">Enemy</a></li><li><a href="Entity.html">Entity</a></li><li><a href="GraphicEntity.html">GraphicEntity</a></li><li><a href="Player.html">Player</a></li><li><a href="TextEntity.html">TextEntity</a></li></ul><h3>Global</h3><ul><li><a href="global.html#allEnemies">allEnemies</a></li><li><a href="global.html#calculateMaxDimensions">calculateMaxDimensions</a></li><li><a href="global.html#checkCollision">checkCollision</a></li><li><a href="global.html#checkCollisions">checkCollisions</a></li><li><a href="global.html#deaths">deaths</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#player">player</a></li><li><a href="global.html#setOrResetGameObjects">setOrResetGameObjects</a></li><li><a href="global.html#streak">streak</a></li><li><a href="global.html#wins">wins</a></li></ul>
 </nav>
 
 <br class="clear">

@@ -22,16 +22,32 @@ var CONFIG = CONFIG || (function(){
         tileBottom: 37,
         tileTop: 51,
         tileHeight: 171,
-        dy: -26
+        dy: -26,
+        scale: 1
     };
 
     /* Getters */
 
-    function getColWidth() { return settings.colWidth; }
+    function getNativeCanvasWidth() { return settings.numCols * settings.colWidth; }
 
-    function getRowHeight() { return settings.rowHeight; }
+    function getNativeCanvasHeight() { return getNumRows() * settings.rowHeight +
+                                              settings.tileTop + settings.tileBottom; }
 
-    function getDY() { return settings.dy; }
+    function getTileHeight() { return settings.scale * settings.tileHeight; }
+
+    function getScalingFactor() { return settings.scale }
+
+    function getNativeColWidth() { return settings.colWidth }
+
+    function getColWidth() { return settings.scale * settings.colWidth; }
+
+    function getNativeRowHeight() { return settings.rowHeight; }
+
+    function getRowHeight() { return settings.scale * settings.rowHeight; }
+
+    function getNativeDY() { return settings.dy }
+
+    function getDY() { return settings.scale * settings.dy; }
 
     function getNumLanes() { return settings.numLanes; }
 
@@ -45,17 +61,17 @@ var CONFIG = CONFIG || (function(){
 
     function getNumRows() { return settings.numLanes + 3; }
 
-    function getCanvasWidth() { return settings.numCols * settings.colWidth; }
+    function getCanvasWidth() { return settings.scale * getNativeCanvasWidth(); }
 
-    function getCanvasHeight() {
-        return getNumRows() * settings.rowHeight + settings.tileTop + settings.tileBottom;
-    }
+    function getCanvasHeight() { return settings.scale * getNativeCanvasHeight(); }
 
     function getPlayerStartCol() { return Math.floor(settings.numCols / 2); }
 
     function getPlayerStartRow() { return getNumRows() - 1; }
 
     /* Setters */
+
+    function setScalingFactor(scale) { settings.scale = scale; return settings.scale; }
 
     function incrementGameDifficulty() {
         if (settings.gameDifficulty < 9) { return ++settings.gameDifficulty; }
@@ -115,16 +131,58 @@ var CONFIG = CONFIG || (function(){
         },
 
         /**
+         * Calculate what the unscaled canvas width should be
+         * @type {number}
+         */
+        getNativeCanvasWidth: getNativeCanvasWidth,
+
+        /**
+         * Calculate what the unscaled canvas height should be
+         * @type {number}
+         */
+        getNativeCanvasHeight: getNativeCanvasHeight,
+
+        /**
+         * Get height of full image file used for tiles
+         * @returns {number}
+         */
+        getTileHeight: getTileHeight,
+
+        /**
+         * Get Scaling Factor
+         * @returns {number}
+         */
+        getScalingFactor: getScalingFactor,
+
+        /**
+         * Get Unscaled Column Width
+         * @returns {number}
+         */
+        getNativeColWidth: getNativeColWidth,
+
+        /**
          * Get Column Width
          * @returns {number}
          */
         getColWidth: getColWidth,
 
         /**
+         * Get Unscaled Row Height
+         * @returns {number}
+         */
+        getNativeRowHeight: getNativeRowHeight,
+
+        /**
          * Get Row Height
          * @returns {number}
          */
         getRowHeight: getRowHeight,
+
+        /**
+         * Get Unscaled delta
+         * @returns {number}
+         */
+        getNativeDY: getNativeDY,
 
         /**
          * Get delta-y (y-offset to position player in center of cells)
@@ -194,6 +252,11 @@ var CONFIG = CONFIG || (function(){
          */
         getPlayerStartRow: getPlayerStartRow,
 
+        /**
+         * Set new Scaling Factor
+         * @return {number} New Scaling Factor
+         */
+        setScalingFactor: setScalingFactor,
 
         /**
          * Increase game difficulty by 1

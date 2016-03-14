@@ -50,16 +50,32 @@ var CONFIG = CONFIG || (function(){
         tileBottom: 37,
         tileTop: 51,
         tileHeight: 171,
-        dy: -26
+        dy: -26,
+        scale: 1
     };
 
     /* Getters */
 
-    function getColWidth() { return settings.colWidth; }
+    function getNativeCanvasWidth() { return settings.numCols * settings.colWidth; }
 
-    function getRowHeight() { return settings.rowHeight; }
+    function getNativeCanvasHeight() { return getNumRows() * settings.rowHeight +
+                                              settings.tileTop + settings.tileBottom; }
 
-    function getDY() { return settings.dy; }
+    function getTileHeight() { return settings.scale * settings.tileHeight; }
+
+    function getScalingFactor() { return settings.scale }
+
+    function getNativeColWidth() { return settings.colWidth }
+
+    function getColWidth() { return settings.scale * settings.colWidth; }
+
+    function getNativeRowHeight() { return settings.rowHeight; }
+
+    function getRowHeight() { return settings.scale * settings.rowHeight; }
+
+    function getNativeDY() { return settings.dy }
+
+    function getDY() { return settings.scale * settings.dy; }
 
     function getNumLanes() { return settings.numLanes; }
 
@@ -73,17 +89,17 @@ var CONFIG = CONFIG || (function(){
 
     function getNumRows() { return settings.numLanes + 3; }
 
-    function getCanvasWidth() { return settings.numCols * settings.colWidth; }
+    function getCanvasWidth() { return settings.scale * getNativeCanvasWidth(); }
 
-    function getCanvasHeight() {
-        return getNumRows() * settings.rowHeight + settings.tileTop + settings.tileBottom;
-    }
+    function getCanvasHeight() { return settings.scale * getNativeCanvasHeight(); }
 
     function getPlayerStartCol() { return Math.floor(settings.numCols / 2); }
 
     function getPlayerStartRow() { return getNumRows() - 1; }
 
     /* Setters */
+
+    function setScalingFactor(scale) { settings.scale = scale; return settings.scale; }
 
     function incrementGameDifficulty() {
         if (settings.gameDifficulty &lt; 9) { return ++settings.gameDifficulty; }
@@ -143,16 +159,58 @@ var CONFIG = CONFIG || (function(){
         },
 
         /**
+         * Calculate what the unscaled canvas width should be
+         * @type {number}
+         */
+        getNativeCanvasWidth: getNativeCanvasWidth,
+
+        /**
+         * Calculate what the unscaled canvas height should be
+         * @type {number}
+         */
+        getNativeCanvasHeight: getNativeCanvasHeight,
+
+        /**
+         * Get height of full image file used for tiles
+         * @returns {number}
+         */
+        getTileHeight: getTileHeight,
+
+        /**
+         * Get Scaling Factor
+         * @returns {number}
+         */
+        getScalingFactor: getScalingFactor,
+
+        /**
+         * Get Unscaled Column Width
+         * @returns {number}
+         */
+        getNativeColWidth: getNativeColWidth,
+
+        /**
          * Get Column Width
          * @returns {number}
          */
         getColWidth: getColWidth,
 
         /**
+         * Get Unscaled Row Height
+         * @returns {number}
+         */
+        getNativeRowHeight: getNativeRowHeight,
+
+        /**
          * Get Row Height
          * @returns {number}
          */
         getRowHeight: getRowHeight,
+
+        /**
+         * Get Unscaled delta
+         * @returns {number}
+         */
+        getNativeDY: getNativeDY,
 
         /**
          * Get delta-y (y-offset to position player in center of cells)
@@ -222,6 +280,11 @@ var CONFIG = CONFIG || (function(){
          */
         getPlayerStartRow: getPlayerStartRow,
 
+        /**
+         * Set new Scaling Factor
+         * @return {number} New Scaling Factor
+         */
+        setScalingFactor: setScalingFactor,
 
         /**
          * Increase game difficulty by 1
@@ -269,13 +332,13 @@ var CONFIG = CONFIG || (function(){
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-CONFIG.html">CONFIG</a></li></ul><h3>Classes</h3><ul><li><a href="Enemy.html">Enemy</a></li><li><a href="Entity.html">Entity</a></li><li><a href="GraphicEntity.html">GraphicEntity</a></li><li><a href="Player.html">Player</a></li><li><a href="Stats.html">Stats</a></li></ul><h3>Global</h3><ul><li><a href="global.html#allEnemies">allEnemies</a></li><li><a href="global.html#checkCollision">checkCollision</a></li><li><a href="global.html#checkCollisions">checkCollisions</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#player">player</a></li><li><a href="global.html#setOrResetGameObjects">setOrResetGameObjects</a></li><li><a href="global.html#stats">stats</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-CONFIG.html">CONFIG</a></li></ul><h3>Classes</h3><ul><li><a href="Enemy.html">Enemy</a></li><li><a href="Entity.html">Entity</a></li><li><a href="GraphicEntity.html">GraphicEntity</a></li><li><a href="Player.html">Player</a></li><li><a href="TextEntity.html">TextEntity</a></li></ul><h3>Global</h3><ul><li><a href="global.html#allEnemies">allEnemies</a></li><li><a href="global.html#calculateMaxDimensions">calculateMaxDimensions</a></li><li><a href="global.html#checkCollision">checkCollision</a></li><li><a href="global.html#checkCollisions">checkCollisions</a></li><li><a href="global.html#deaths">deaths</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#player">player</a></li><li><a href="global.html#setOrResetGameObjects">setOrResetGameObjects</a></li><li><a href="global.html#streak">streak</a></li><li><a href="global.html#wins">wins</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat Mar 12 2016 07:01:23 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Mar 14 2016 03:50:10 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

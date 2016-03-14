@@ -66,6 +66,7 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
+        canvas.onclick = onCanvasClick;
         reset();
         lastTime = Date.now();
         main();
@@ -142,7 +143,12 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+                var scale = CONFIG.getScalingFactor();
+                var dx = CONFIG.getColWidth();
+                var dy = CONFIG.getRowHeight();
+                var dWidth = dx;
+                var dHeight = CONFIG.getTileHeight();
+                ctx.drawImage(Resources.get(rowImages[row]), col * dx, row * dy, dWidth, dHeight);
             }
         }
 
@@ -162,12 +168,13 @@ var Engine = (function(global) {
         });
 
         player.render();
-        stats.render();     // renders streak information
+        streak.render();    // renders streak information
+        wins.render();      // renders wins information
+        deaths.render();    // renders deaths information
     }
 
     function reset() {
-        canvas.width = CONFIG.getCanvasWidth();
-        canvas.height = CONFIG.getCanvasHeight();
+        scaleCanvas();
         setOrResetGameObjects();
         pendingReset = false;
     }
