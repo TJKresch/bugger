@@ -172,8 +172,10 @@ var getRandomInt = function(min, max) {
 };
 
 /**
- * Loop through allEnemies, check for collisions with player, and
+ * Loop through an array of enemies, check for collisions with player, and
  * respond appropriately
+ * @param {Array.<Enemy>} enemyArray - An array of Enemy objects
+ * @param {Player} playerInstance - An instance of the Player class
  * @function
  * @returns {undefined}
  */
@@ -489,8 +491,8 @@ Stats.prototype.render = function() {
     ctx.strokeStyle = "black";
     ctx.fillStyle = "white";
     ctx.lineWidth = 3;
-    ctx.strokeText(stats.streak, stats.streakX, stats.streakY);
-    ctx.fillText(stats.streak, stats.streakX, stats.streakY);
+    ctx.strokeText(this.streak, this.streakX, this.streakY);
+    ctx.fillText(this.streak, this.streakX, this.streakY);
 };
 
 /********* Instantiate Game Objects *********/
@@ -509,7 +511,7 @@ var player = new Player();
 
 /**
  * Global {@link Enemy} array
- * @type {Array}
+ * @type {Array.<Enemy>}
  * @global
  */
 var allEnemies = [];
