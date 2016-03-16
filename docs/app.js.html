@@ -55,11 +55,14 @@ var getRandomInt = function(min, max) {
  * @function
  * @returns {undefined}
  */
-var checkCollisions = function(enemyArray, playerInstance) {
-    enemyArray.forEach(function(enemy) {
-        if (checkCollision(enemy, playerInstance)) {
-            playerInstance.die();
+var checkCollisions = function(entityArray, entity) {
+    entityArray.forEach(function(e) {
+        if (checkCollision(e, entity)) {
+            entity.handleCollision(e);
+            e.handleCollision(entity);
+            return e;
         }
+        return false;
     });
 };
 
@@ -70,6 +73,8 @@ var checkCollisions = function(enemyArray, playerInstance) {
  * @param {Enemy} e - Enemy instance
  * @param {Player} p - Player instance
  * @returns {boolean} true if collision, false otherwise
+ * @todo Differentiate collision detection between different entity types
+ * @todo  Move offsets to visual pixels into entities
  */
 var checkCollision = function(e, p) {
     /*
@@ -122,9 +127,17 @@ var calculateMaxDimensions = function(maxWidth, maxHeight, aspectRatio) {
  * @classdesc Abstract class for all game entities
  * @returns {Entity}
  */
-var Entity = function() {
+function Entity() {
     this.x = 0;
     this.y = 0;
+}
+
+/**
+ * Get class name
+ * @return {string} Name of entity's class as a string
+ */
+Entity.prototype.className = function() {
+    return this.constructor.name;
 };
 
 /**
@@ -133,7 +146,9 @@ var Entity = function() {
  * @returns {undefined}
  * @abstract
  */
-Entity.prototype.update = function() {};
+Entity.prototype.update = function() {
+    console.log("Using Entity prototype update method");
+};
 
 /**
  * Render to Canvas
@@ -141,7 +156,21 @@ Entity.prototype.update = function() {};
  * @returns {undefined}
  * @abstract
  */
-Entity.prototype.render = function() {};
+Entity.prototype.render = function() {
+    console.log("Using Entity prototype render method");
+};
+
+/**
+ * Handle collision with another entity
+ * @param  {Entity} entity - The entity that this entity
+ * collided with
+ * @method
+ * @returns {undefined}
+ * @abstract
+ */
+Entity.prototype.handleCollision = function(entity) {
+    console.log("Using Entity prototype handleCollision method");
+};
 
 /**
  * Get scaled x position
@@ -171,13 +200,13 @@ Entity.prototype.scaledY = function() {
  * @property {string} sprite Relative path or URL to sprite
  * @returns {GraphicEntity}
  */
-var GraphicEntity = function(spritePath) {
+function GraphicEntity(spritePath) {
     Entity.call(this);
 
     // The image/sprite for the entity
     // Uses a helper to easily load images
     this.sprite = spritePath;
-};
+}
 
 // Set up prototype relation with Entity class
 GraphicEntity.prototype = Object.create(Entity.prototype);
@@ -208,7 +237,7 @@ GraphicEntity.prototype.render = function() {
  * @property {string} sprite Relative path or URL to sprite
  * @returns {Enemy}
  */
-var Enemy = function() {
+function Enemy() {
 
     // Inherit properties from GraphicEntity class
     GraphicEntity.call(this, 'images/enemy-bug.png');
@@ -218,7 +247,7 @@ var Enemy = function() {
 
     // Set properties randomly: x, y, and speed
     this.setRandomValues();
-};
+}
 
 // Set up prototype relation with GraphicEntity class
 Enemy.prototype = Object.create(GraphicEntity.prototype);
@@ -258,11 +287,22 @@ Enemy.prototype.update = function(dt) {
 
     // Advance enemy position based on speed
     // If off the map, loop back around and roll new values
-    if (this.scaledX() &lt; CONFIG.getColWidth() * CONFIG.getNumCols()) {
+    if (this.x &lt; CONFIG.getNativeColWidth() * CONFIG.getNumCols()) {
         this.x += dt * this.speed;
     } else {
         this.setRandomValues();
     }
+};
+
+/**
+ * [noop] Handle collision with another entity
+ * @param  {Entity} entity - The entity that this entity
+ * collided with
+ * @method
+ * @returns {undefined}
+ */
+Enemy.prototype.handleCollision = function(entity) {
+    /* noop */
 };
 
 /**
@@ -275,10 +315,10 @@ Enemy.prototype.update = function(dt) {
  * @property {string} sprite Relative path or URL to sprite
  * @returns {Player}
  */
-var Player = function() {
+function Player() {
     GraphicEntity.call(this, 'images/char-boy.png');
     this.setInitialPosition();
-};
+}
 
 // Set up prototype relation with GraphicEntity class
 Player.prototype = Object.create(GraphicEntity.prototype);
@@ -305,8 +345,45 @@ Player.prototype.update = function() {
 };
 
 /**
+ * [noop] Handle collision with another entity
+ * @param  {Entity} entity - The entity that this entity
+ * collided with
+ * @method
+ * @returns {undefined}
+ */
+Player.prototype.handleCollision = function(entity) {
+    var entityClass = entity.className();
+    if (entityClass === 'Enemy') {
+        this.die();
+    }
+};
+
+/**
+ * Player death handler
+ * @method
+ * @returns {undefined}
+ */
+Player.prototype.die = function() {
+    streak.resetValue();
+    deaths.incrementValue();
+    this.setInitialPosition();
+};
+
+/**
+ * Player win handler
+ * @method
+ * @returns {undefined}
+ */
+Player.prototype.win = function() {
+    wins.incrementValue();
+    streak.incrementValue();
+    this.setInitialPosition();
+};
+
+/**
  * Input Handler - Allow player to move with keyboard arrow keys
- * and contain player within game boundaries
+ * and contain player within game boundaries &lt;br>
+ * All calculations are done with unscaled positions and sizes
  * @method
  * @param {string} direction - 'up', 'down', 'left', or 'right'
  * @returns {undefined}
@@ -342,7 +419,7 @@ Player.prototype.handleInput = function(direction) {
  * @returns {number}
  */
 Player.prototype.getCurrentCol = function() {
-    return this.scaledX() / CONFIG.getColWidth();
+    return this.x / CONFIG.getNativeColWidth();
 };
 
 /**
@@ -351,29 +428,7 @@ Player.prototype.getCurrentCol = function() {
  * @returns {number}
  */
 Player.prototype.getCurrentRow = function() {
-    return (this.scaledY() - CONFIG.getDY()) / CONFIG.getRowHeight();
-};
-
-/**
- * Player death handler
- * @method
- * @returns {undefined}
- */
-Player.prototype.die = function() {
-    streak.resetValue();
-    deaths.incrementValue();
-    this.setInitialPosition();
-};
-
-/**
- * Player win handler
- * @method
- * @returns {undefined}
- */
-Player.prototype.win = function() {
-    wins.incrementValue();
-    streak.incrementValue();
-    this.setInitialPosition();
+    return (this.y - CONFIG.getNativeDY()) / CONFIG.getNativeRowHeight();
 };
 
 /**
@@ -383,26 +438,32 @@ Player.prototype.win = function() {
  * @extends Entity
  * @param {number} x - Set &lt;code>x&lt;/code> property
  * @param {number} y - Set &lt;code>y&lt;/code> property
- * @param {string} textAlign Set Text alignment &lt;br> Allowed values:
- * 'left', 'right', 'center'
  * @param {string} label - Set &lt;code>label&lt;/code> property
  * @param {number} value - Set initial &lt;code>val&lt;/code> property
+ * @param {object} displayOptions Optional properties object to set on canvas context
+ * before rendering. Keys and values are copied into TextEntity instance and
+ * should be valid properties and values of a 2d canvas context
  * @property {number} x - x-position on canvas
  * @property {number} y - y-position on canvas
- * @property {string} textAlign - Set Text alignment &lt;br> Allowed values:
- * 'left', 'right', 'center'
  * @property {string} label - Static text to display
  * @property {number} value - Dynamic value to display
+ * @property {object} displayOptions Optional properties to set on canvas context
+ * before rendering
  * @returns {TextEntity}
  */
-var TextEntity = function(x, y, textAlign, label, value) {
+function TextEntity(x, y, label, value, displayOptions) {
     Entity.call(this);
     this.x = x;
     this.y = y;
-    this.textAlign = textAlign;
     this.label = label;
     this.value = value;
-};
+    this.displayOptions = {};
+    for (var key in displayOptions) {
+        if (displayOptions.hasOwnProperty(key)) {
+            this.displayOptions[key] = displayOptions[key];
+        }
+    }
+}
 
 // Set up prototype relation with Entity class
 TextEntity.prototype = Object.create(Entity.prototype);
@@ -427,68 +488,31 @@ TextEntity.prototype.resetValue = function() { this.value = 0; };
  * @returns {undefined}
  */
 TextEntity.prototype.render = function() {
-    var scale = CONFIG.getScalingFactor();
-    var fontSize = Math.floor(18 * scale);
+    var scale,
+        fontSize,
+        formattedString;
+
+    scale = CONFIG.getScalingFactor();
+
+    fontSize = Math.floor(18 * scale);
     fontSize = String(fontSize) + "pt";
+
+    formattedString = this.label.replace("%value%", this.value);
 
     ctx.font = fontSize + " Impact";
     ctx.strokeStyle = "black";
     ctx.fillStyle = "white";
     ctx.lineWidth = 3;
-    ctx.textAlign = this.textAlign;
-    var displayText = this.label + ": " + this.value;
-    ctx.strokeText(displayText, this.scaledX(), this.scaledY());
-    ctx.fillText(displayText, this.scaledX(), this.scaledY());
+
+    for (var key in this.displayOptions) {
+        if (this.displayOptions.hasOwnProperty(key)) {
+            ctx[key] = this.displayOptions[key];
+        }
+    }
+
+    ctx.strokeText(formattedString, this.scaledX(), this.scaledY());
+    ctx.fillText(formattedString, this.scaledX(), this.scaledY());
 };
-
-// /**
-//  * Game Stats constructor function
-//  * @constructor
-//  * @extends Entity
-//  * @param {number} x - Text x position
-//  * @param {number} y - Text y position
-//  * @property {number} streakX - x-value of render location
-//  * @property {number} streakY - y-value of render location
-//  * @property {number} streak - Current streak value
-//  * @returns {Stats}
-//  */
-// var Stats = function(x, y) {
-//     // Where to display current streak
-//     this.streakX = x;
-//     this.streakY = y;
-
-//     // Initialize current streak to 0
-//     this.streak = 0;
-// };
-
-// /**
-//  * Increases the current streak by one
-//  * @method
-//  * @returns {undefined}
-//  */
-// Stats.prototype.incrementStreak = function() { this.streak++; };
-
-// /**
-//  * Resets the current streak to zero
-//  * @method
-//  * @returns {undefined}
-//  */
-// Stats.prototype.resetStreak = function() { this.streak = 0; };
-
-// /**
-//  * Renders current streak text to the screen
-//  * @returns {undefined}
-//  */
-// Stats.prototype.render = function() {
-//     ctx.font = "18pt Impact";
-//     ctx.strokeStyle = "black";
-//     ctx.fillStyle = "white";
-//     ctx.lineWidth = 3;
-//     ctx.textAlign = "right";
-//     var displayText = "Current Streak: " + this.streak;
-//     ctx.strokeText(displayText, this.streakX, this.streakY);
-//     ctx.fillText(displayText, this.streakX, this.streakY);
-// };
 
 /**
  * Global Player instance
@@ -500,7 +524,6 @@ var player;
 
 /**
  * Global array to hold all Enemy instances
->>>>>>> feat: Add responsive auto-scaling
  * @type {Enemy[]}
  * @global
  */
@@ -561,32 +584,36 @@ var setOrResetGameObjects = function() {
         allEnemies.push(new Enemy());
     }
 
-    var scale = CONFIG.getScalingFactor();
-
     /* Create or replace Stats instance in global 'stats' variable */
 
     streak = new TextEntity(
         CONFIG.getNativeCanvasWidth() - 20,
         CONFIG.getNativeCanvasHeight() - 75,
-        "right",
-        "Current Streak",
-        0
+        "Current Streak: %value%",
+        0,
+        {
+            textAlign: "right"
+        }
     );
 
     wins = new TextEntity(
         CONFIG.getNativeCanvasWidth() - 20,
         CONFIG.getNativeCanvasHeight() - 50,
-        "right",
-        "Total Wins",
-        0
+        "Total Wins: %value%",
+        0,
+        {
+            textAlign: "right"
+        }
     );
 
     deaths = new TextEntity(
         CONFIG.getNativeCanvasWidth() - 20,
         CONFIG.getNativeCanvasHeight() - 25,
-        "right",
-        "Total Deaths",
-        0
+        "Total Deaths: %value%",
+        0,
+        {
+            textAlign: "right"
+        }
     );
 
 };
@@ -636,7 +663,7 @@ var scaleCanvas = function() {
     var nativeHeight = CONFIG.getNativeCanvasHeight();
     //  - document.getElementById('container').clientHeight
     var gameAR = nativeWidth / nativeHeight;
-    var viewportHeight = document.documentElement.clientHeight;
+    var viewportHeight = document.documentElement.clientHeight - canvas.offsetTop;
     var viewportWidth = document.documentElement.clientWidth;
     var scaled = calculateMaxDimensions(viewportWidth, viewportHeight, gameAR);
     var scalingFactor;

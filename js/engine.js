@@ -143,7 +143,6 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                var scale = CONFIG.getScalingFactor();
                 var dx = CONFIG.getColWidth();
                 var dy = CONFIG.getRowHeight();
                 var dWidth = dx;

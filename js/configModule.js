@@ -11,7 +11,8 @@ var CONFIG = CONFIG || (function(){
     // will need to be updated if different sized tiles (images) are used
 
     /**
-     * Private holder for game settings (not accessible outside closure scope) <br>
+     * Private holder for game settings (not directly accessible outside
+     * of closure scope) <br>
      * Values set by CONFIG.init() <br>
      * All 'getter' methods pull data from here
      * @alias module:CONFIG~settings
@@ -35,9 +36,9 @@ var CONFIG = CONFIG || (function(){
 
     function getTileHeight() { return settings.scale * settings.tileHeight; }
 
-    function getScalingFactor() { return settings.scale }
+    function getScalingFactor() { return settings.scale; }
 
-    function getNativeColWidth() { return settings.colWidth }
+    function getNativeColWidth() { return settings.colWidth; }
 
     function getColWidth() { return settings.scale * settings.colWidth; }
 
@@ -45,7 +46,7 @@ var CONFIG = CONFIG || (function(){
 
     function getRowHeight() { return settings.scale * settings.rowHeight; }
 
-    function getNativeDY() { return settings.dy }
+    function getNativeDY() { return settings.dy; }
 
     function getDY() { return settings.scale * settings.dy; }
 
@@ -74,11 +75,11 @@ var CONFIG = CONFIG || (function(){
     function setScalingFactor(scale) { settings.scale = scale; return settings.scale; }
 
     function incrementGameDifficulty() {
-        if (settings.gameDifficulty < 9) { return ++settings.gameDifficulty; }
+        if (settings.gameDifficulty < 20) { return ++settings.gameDifficulty; }
     }
 
     function decrementGameDifficulty() {
-        if (settings.gameDifficulty > 2) { return --settings.gameDifficulty; }
+        if (settings.gameDifficulty > 1) { return --settings.gameDifficulty; }
     }
 
     function incrementNumEnemies() {
@@ -86,11 +87,11 @@ var CONFIG = CONFIG || (function(){
     }
 
     function decrementNumEnemies() {
-        if (settings.numEnemies > 2) { return --settings.numEnemies; }
+        if (settings.numEnemies > 0) { return --settings.numEnemies; }
     }
 
     function incrementNumLanes() {
-        if (settings.numLanes < 5) { return ++settings.numLanes; }
+        if (settings.numLanes < 10) { return ++settings.numLanes; }
     }
 
     function decrementNumLanes() {
@@ -98,11 +99,11 @@ var CONFIG = CONFIG || (function(){
     }
 
     function incrementNumCols() {
-        if (settings.numCols < 11) { return ++settings.numCols; }
+        if (settings.numCols < 20) { return ++settings.numCols; }
     }
 
     function decrementNumCols() {
-        if (settings.numCols > 2) {return --settings.numCols; }
+        if (settings.numCols > 1) {return --settings.numCols; }
     }
 
     /** @lends module:CONFIG */
