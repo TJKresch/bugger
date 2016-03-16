@@ -1,4 +1,8 @@
 {
+  "tags": {
+    "allowUnknownTags": false,
+    "dictionaries": ["jsdoc","closure"]
+  },
   "source": {
     "include": ["./js/"],
     "exclude": [],
@@ -10,5 +14,11 @@
     "encoding": "utf8",
     "destination": "./docs/",
     "recurse": true
+  },
+  "templates": {
+    "cleverLinks": true,
+    "default": {
+      "includeDate": false
+    }
   }
 }
