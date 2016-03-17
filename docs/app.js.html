@@ -19,11 +19,11 @@
 
     <h1 class="page-title">Source: app.js</h1>
 
+    
 
 
 
-
-
+    
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/* app.js */
@@ -48,7 +48,7 @@ var getRandomInt = function(min, max) {
 };
 
 /**
- * Loop through an array of enemies, check for collisions with player, and
+ * Loop through allEnemies, check for collisions with player, and
  * respond appropriately
  * @param {Array.&lt;Enemy>} enemyArray - An array of Enemy objects
  * @param {Player} playerInstance - An instance of the Player class
@@ -584,7 +584,7 @@ var setOrResetGameObjects = function() {
         allEnemies.push(new Enemy());
     }
 
-    /* Create or replace Stats instance in global 'stats' variable */
+    /* Create or replace global Text Entities */
 
     streak = new TextEntity(
         CONFIG.getNativeCanvasWidth() - 20,
