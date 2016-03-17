@@ -556,7 +556,7 @@ var setOrResetGameObjects = function() {
         allEnemies.push(new Enemy());
     }
 
-    /* Create or replace Stats instance in global 'stats' variable */
+    /* Create or replace global Text Entities */
 
     streak = new TextEntity(
         CONFIG.getNativeCanvasWidth() - 20,
